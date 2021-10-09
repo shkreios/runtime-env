@@ -1,0 +1,32 @@
+{
+  "name": "runtime-env",
+  "version": "0.0.0",
+  "description": "A Cli to generate runtime-env for frontend apps",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "go-npm install",
+    "preuninstall": "go-npm uninstall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shkreios/runtime-env.git"
+  },
+  "keywords": [
+    "cli",
+    "automation"
+  ],
+  "author": "shessel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shkreios/runtime-env/issues"
+  },
+  "homepage": "https://github.com/shkreios/runtime-env#readme",
+  "dependencies": {
+    "go-npm": "^0.1.9"
+  },
+  "goBinary": {
+    "name": "runtime-env",
+    "path": "./bin",
+    "url": "https://github.com/shkreios/runtime-env/releases/download/v{{version}}/html-serve_{{version}}_{{platform}}_{{arch}}.tar.gz"
+  }
+}
