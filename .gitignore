@@ -1,0 +1,9 @@
+node_modules/
+bin/
+.env
+
+env.js
+
+
+runtime-env
+yarn-lock.error
