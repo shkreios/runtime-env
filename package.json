@@ -27,6 +27,6 @@
   "goBinary": {
     "name": "runtime-env",
     "path": "./bin",
-    "url": "https://github.com/shkreios/runtime-env/releases/download/v{{version}}/html-serve_{{version}}_{{platform}}_{{arch}}.tar.gz"
+    "url": "https://github.com/shkreios/runtime-env/releases/download/v{{version}}/runtime-env_{{version}}_{{platform}}_{{arch}}.tar.gz"
   }
 }
