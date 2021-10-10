@@ -181,9 +181,9 @@ glob@^7.1.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-"go-npm@https://github.com/jumoel/go-npm.git#feat/yarn-support-built":
+"go-npm@https://github.com/shkreios/go-npm.git#master":
   version "0.1.8"
-  resolved "https://github.com/jumoel/go-npm.git#7659e79c0160ebd05d76407d2219962adb988ec9"
+  resolved "https://github.com/shkreios/go-npm.git#a853f5e781fa621d67e369082137e988baf3e095"
   dependencies:
     mkdirp "^0.5.1"
     request "^2.81.0"

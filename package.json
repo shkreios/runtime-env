@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/shkreios/runtime-env#readme",
   "dependencies": {
-    "go-npm": "https://github.com/jumoel/go-npm.git#feat/yarn-support-built"
+    "go-npm": "https://github.com/shkreios/go-npm.git#master"
   },
   "goBinary": {
     "name": "runtime-env",
