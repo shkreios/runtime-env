@@ -1,6 +1,6 @@
 {
   "name": "runtime-env",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Cli to generate runtime-env for frontend apps",
   "main": "index.js",
   "bin": {
