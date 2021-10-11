@@ -3,10 +3,13 @@
   "version": "0.1.3",
   "description": "A Cli to generate runtime-env for frontend apps",
   "main": "index.js",
-  "scripts": {
-    "postinstall": "go-npm install",
-    "preuninstall": "go-npm uninstall"
+  "bin": {
+    "runtime-env": "./npm/run.js"
   },
+  "files": [
+    "npm/**/*"
+  ],
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shkreios/runtime-env.git"
@@ -22,11 +25,12 @@
   },
   "homepage": "https://github.com/shkreios/runtime-env#readme",
   "dependencies": {
-    "go-npm": "https://github.com/shkreios/go-npm.git#master"
+    "gunzip-maybe": "^1.4.2",
+    "node-fetch": "^3.0.0",
+    "tar": "^6.1.11"
   },
-  "goBinary": {
+  "binary": {
     "name": "runtime-env",
-    "path": "./bin",
     "url": "https://github.com/shkreios/runtime-env/releases/download/v{{version}}/runtime-env_{{version}}_{{platform}}_{{arch}}.tar.gz"
   }
 }
