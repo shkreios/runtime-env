@@ -78,7 +78,7 @@ func writeFile(name string, contents string) error {
 func main() {
 
 	app := &cli.App{
-		Name:  "runtime-cra",
+		Name:  "runtime-env",
 		Usage: "make an explosive entrance",
 		Flags: []cli.Flag{
 			&cli.StringFlag{

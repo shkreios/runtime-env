@@ -42,7 +42,7 @@ TEST=Test
 ## Command
 
 ```sh
-$ runtime-env.go -f .env --no-envs
+$ runtime-env -f .env --no-envs
 ```
 
 ## Output

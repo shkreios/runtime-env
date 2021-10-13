@@ -18,16 +18,14 @@
     "cli",
     "automation"
   ],
-  "author": "shessel",
+  "author": "Simon Hessel",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/shkreios/runtime-env/issues"
   },
   "homepage": "https://github.com/shkreios/runtime-env#readme",
   "dependencies": {
-    "gunzip-maybe": "^1.4.2",
-    "node-fetch": "^3.0.0",
-    "tar": "^6.1.11"
+    "binary-cli-install": "^1.0.0"
   },
   "binary": {
     "name": "runtime-env",
