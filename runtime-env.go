@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/shkreios/runtime-env/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 
@@ -57,12 +58,39 @@ func load(envfile string, prefix string, removePrefix bool, noenvs bool) (map[st
 	return envs, nil
 }
 
-func generateConfig(config map[string]string) (string, error) {
+func generateJSConfig(config map[string]string) (string, error) {
 	res, err := json.Marshal(config)
 	if err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("window.__RUNTIME_CONFIG__ = %s", res), nil
+}
+
+func KeysString(m map[string]string) string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, fmt.Sprintf("\t\t\t%s: string;", k))
+	}
+	return strings.Join(keys, "\n")
+}
+
+func generateTSConfig(config map[string]string) (string, error) {
+	return fmt.Sprintf(`/* eslint-disable */
+/* ignore jslint start */
+// tslint:disable
+// jscs:disable
+// jshint ignore: start
+// prettier-ignore
+
+export {};
+
+declare global {
+	interface Window {
+		__RUNTIME_CONFIG__: {
+%s		
+		};
+	}
+}`, KeysString(config)), nil
 }
 
 func writeFile(name string, contents string) error {
@@ -77,47 +105,78 @@ func writeFile(name string, contents string) error {
 
 func main() {
 
+	var envFile string
+	var prefix string
+	var output string
+	var typeDeclarationsFile string
+	var removePrefix bool
+	var noEnvs bool
+
 	app := &cli.App{
-		Name:  "runtime-env",
-		Usage: "make an explosive entrance",
+		Version:              config.Version,
+		EnableBashCompletion: true,
+		Name:                 "runtime-env",
+		Usage:                "make an explosive entrance",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "env-file",
-				Usage:   "The .env file to be parsed",
-				Aliases: []string{"f"},
+				Name:        "env-file",
+				Destination: &envFile,
+				Usage:       "The .env file to be parsed",
+				Aliases:     []string{"f"},
 			},
 			&cli.StringFlag{
-				Name:    "prefix",
-				Usage:   "The env prefix to matched",
-				Aliases: []string{"p"},
+				Name:        "prefix",
+				Destination: &prefix,
+				Usage:       "The env prefix to matched",
+				Aliases:     []string{"p"},
 			},
 			&cli.StringFlag{
-				Name:    "output",
-				Usage:   "Output file path",
-				Value:   "./env.js",
-				Aliases: []string{"o"},
+				Name:        "output",
+				Destination: &output,
+				Usage:       "Output file path",
+				Value:       "./env.js",
+				Aliases:     []string{"o"},
+			},
+			&cli.StringFlag{
+				Name:        "type-declarations-file",
+				Destination: &typeDeclarationsFile,
+				Usage:       "Output file path for the typescript declaration file",
+				Aliases:     []string{"dts"},
 			},
 			&cli.BoolFlag{
-				Name:  "remove-prefix",
-				Value: false,
-				Usage: "Remove the prefix from the env",
+				Name:        "remove-prefix",
+				Destination: &removePrefix,
+				Value:       false,
+				Usage:       "Remove the prefix from the env",
 			}, &cli.BoolFlag{
-				Name:  "no-envs",
-				Value: false,
-				Usage: "Only read envs from file not from environment variables",
+				Name:        "no-envs",
+				Destination: &noEnvs,
+				Value:       false,
+				Usage:       "Only read envs from file not from environment variables",
 			},
 		},
 		Action: func(c *cli.Context) error {
-			envs, err := load(c.String("env-file"), c.String("prefix"), c.Bool("remove-prefix"), c.Bool("no-envs"))
+			envs, err := load(envFile, prefix, removePrefix, noEnvs)
 			if err != nil {
 				return err
 			}
-			res, err := generateConfig(envs)
+			js, err := generateJSConfig(envs)
 			if err != nil {
 				return err
 			}
 
-			err = writeFile(c.String("output"), res)
+			if typeDeclarationsFile != "" {
+				ts, err := generateTSConfig(envs)
+				if err != nil {
+					return err
+				}
+				err = writeFile(typeDeclarationsFile, ts)
+				if err != nil {
+					return err
+				}
+			}
+
+			err = writeFile(output, js)
 			if err != nil {
 				return err
 			}
