@@ -1,4 +1,4 @@
-module runtime-env
+module github.com/shkreios/runtime-env
 
 go 1.17
 
