@@ -20,12 +20,24 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/shkreios/runtime-env/pkg/config"
 	"github.com/urfave/cli/v2"
 )
+
+var (
+	version = "v1.0.0"
+	nolog   bool
+)
+
+func printf(format string, a ...interface{}) (n int, err error) {
+	if nolog {
+		return 0, nil
+	}
+	return fmt.Printf(format, a...)
+}
 
 func load(envfile string, prefix string, removePrefix bool, noenvs bool) (map[string]string, error) {
 	if noenvs {
@@ -66,12 +78,12 @@ func generateJSConfig(config map[string]string) (string, error) {
 	return fmt.Sprintf("window.__RUNTIME_CONFIG__ = %s", res), nil
 }
 
-func KeysString(m map[string]string) string {
+func keysString(m map[string]string, template string, delimiter string) string {
 	keys := make([]string, 0, len(m))
 	for k := range m {
-		keys = append(keys, fmt.Sprintf("\t\t\t%s: string;", k))
+		keys = append(keys, fmt.Sprintf(template, k))
 	}
-	return strings.Join(keys, "\n")
+	return strings.Join(keys, delimiter)
 }
 
 func generateTSConfig(config map[string]string) (string, error) {
@@ -79,7 +91,7 @@ func generateTSConfig(config map[string]string) (string, error) {
 /* ignore jslint start */
 // tslint:disable
 // jscs:disable
-// jshint ignore: start
+// jshint ignore: start 
 // prettier-ignore
 
 export {};
@@ -90,10 +102,19 @@ declare global {
 %s		
 		};
 	}
-}`, KeysString(config)), nil
+}`, keysString(config, "\t\t\t%s: string;", "\n")), nil
 }
 
 func writeFile(name string, contents string) error {
+	path := filepath.Dir(name)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err := os.MkdirAll(path, os.ModePerm)
+		printf("Non existent folders on path '%s' have been created\n", path)
+		if err != nil {
+			return err
+		}
+
+	}
 	f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
@@ -113,10 +134,21 @@ func main() {
 	var noEnvs bool
 
 	app := &cli.App{
-		Version:              config.Version,
-		EnableBashCompletion: true,
-		Name:                 "runtime-env",
-		Usage:                "make an explosive entrance",
+		Version: version,
+		Authors: []*cli.Author{
+			{
+				Name:  "Simon Hessel",
+				Email: "simon.hessel@kreios.lu",
+			},
+		},
+		UsageText:              "runtime-env [global options]",
+		Copyright:              "Copyright © 2020 Simon Hessel",
+		EnableBashCompletion:   true,
+		Name:                   "runtime-env",
+		Usage:                  "runtime envs for SPAs",
+		UseShortOptionHandling: true,
+
+		HideHelpCommand: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "env-file",
@@ -143,6 +175,12 @@ func main() {
 				Usage:       "Output file path for the typescript declaration file",
 				Aliases:     []string{"dts"},
 			},
+			&cli.StringFlag{
+				Name:        "global-key",
+				Destination: &typeDeclarationsFile,
+				Usage:       "Customize the key on which the envs will be set on window object",
+				Aliases:     []string{"key"},
+			},
 			&cli.BoolFlag{
 				Name:        "remove-prefix",
 				Destination: &removePrefix,
@@ -153,6 +191,12 @@ func main() {
 				Destination: &noEnvs,
 				Value:       false,
 				Usage:       "Only read envs from file not from environment variables",
+			}, &cli.BoolFlag{
+				Name:        "disable-logs",
+				Destination: &nolog,
+				Value:       false,
+				Aliases:     []string{"no-logs"},
+				Usage:       "Disable logging output",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -160,10 +204,18 @@ func main() {
 			if err != nil {
 				return err
 			}
+
+			printf("Following envs have been loaded: %s\n", keysString(envs, "%s", ", "))
+
 			js, err := generateJSConfig(envs)
 			if err != nil {
 				return err
 			}
+			err = writeFile(output, js)
+			if err != nil {
+				return err
+			}
+			printf("ENVs have been writtem to %s\n", output)
 
 			if typeDeclarationsFile != "" {
 				ts, err := generateTSConfig(envs)
@@ -174,12 +226,9 @@ func main() {
 				if err != nil {
 					return err
 				}
+				printf("Typescript declarations have been writtem to %s\n", typeDeclarationsFile)
 			}
 
-			err = writeFile(output, js)
-			if err != nil {
-				return err
-			}
 			return err
 		},
 	}
