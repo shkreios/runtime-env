@@ -70,12 +70,12 @@ func load(envfile string, prefix string, removePrefix bool, noenvs bool) (map[st
 	return envs, nil
 }
 
-func generateJSConfig(config map[string]string) (string, error) {
+func generateJSConfig(config map[string]string, globalKey string) (string, error) {
 	res, err := json.Marshal(config)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("window.__RUNTIME_CONFIG__ = %s", res), nil
+	return fmt.Sprintf("window.%s = %s", globalKey, res), nil
 }
 
 func keysString(m map[string]string, template string, delimiter string) string {
@@ -132,6 +132,7 @@ func main() {
 	var typeDeclarationsFile string
 	var removePrefix bool
 	var noEnvs bool
+	var globalKey string
 
 	app := &cli.App{
 		Version: version,
@@ -177,9 +178,10 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:        "global-key",
-				Destination: &typeDeclarationsFile,
+				Destination: &globalKey,
 				Usage:       "Customize the key on which the envs will be set on window object",
 				Aliases:     []string{"key"},
+				Value:       "__RUNTIME_CONFIG__",
 			},
 			&cli.BoolFlag{
 				Name:        "remove-prefix",
@@ -207,7 +209,7 @@ func main() {
 
 			printf("Following envs have been loaded: %s\n", keysString(envs, "%s", ", "))
 
-			js, err := generateJSConfig(envs)
+			js, err := generateJSConfig(envs, globalKey)
 			if err != nil {
 				return err
 			}
