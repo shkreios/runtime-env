@@ -140,7 +140,30 @@ curl -sfL https://raw.githubusercontent.com/shkreios/runtime-env/main/install.sh
 runtime-env # your runtime-env flags here
 ```
 
-### Github Action - coming soon
+### [Github Action](https://github.com/shkreios/runtime-env-action)
+
+#### Read from secrets
+
+```yaml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: shkreios/runtime-env-action@v1
+        with:
+          version: v1.1.0
+          prefix: RUN_ENV_
+          output: ./public/env.js
+          removePrefix: "true"
+        env:
+          RUN_ENV_EXAMPLE: ${{ secrets.EXAMPLE }}
+```
+
+```js
+// resulting env.js in public folder
+window.__RUNTIME_CONFIG__ = { EXAMPLE: "SECRET_VALUE" };
+```
 
 # Why go / Why should i use this package?
 
