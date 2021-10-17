@@ -167,11 +167,13 @@ window.__RUNTIME_CONFIG__ = { EXAMPLE: "SECRET_VALUE" };
 
 # Why go / Why should i use this package?
 
-There many solutions similar to this package `react-env`, `runtime-env-cra` or `sh` scripts to name a few. They all flal in one of 2 categories:
+There many solutions similar to this package `react-env`, `runtime-env-cra` or `sh` scripts to name a few. They all fall in one of 2 categories:
 
-1. they are either dependend on a runtime/interpreter to be preinstalled like nodejs or python or
-2. they are not platform agnostic
+1. they are either dependent on a runtime/interpreter to be preinstalled like nodejs or python or
+2. they are not platform-agnostic
+
+Go supports building binaries for multiple platforms and arches, and the binary itself includes everything to be executed. Therefore, no matter if development with npm or in docker CI/CD you can expect it to be easily installed and as light as it can be.
 
 # Why have a npm wrapper/placeholder script?
 
-As this tool will mostly be used in npm codebasis where you expect everything, including a tool that generates runtime-envs, to be installed via npm/yarn it's the best option.
+As this tool will mostly be used in npm codebases where you expect everything, including a tool that generates runtime-envs, to be installed via npm/yarn it's the best option.
