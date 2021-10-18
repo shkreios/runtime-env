@@ -13,7 +13,7 @@ Runtime-env is cli written in go to parse environment variables & generate a jav
 ## Script install
 
 ```bash
-curl -sfL https://raw.githubusercontent.com/shkreios/runtime-env/main/install.sh | sh
+curl -sfL https://shkreios.github.io/runtime-env/install.sh | sh
 ```
 
 ## NPM install
@@ -108,7 +108,7 @@ exec $@
 ...
 
 # install runtime-env via install.sh script
-RUN wget -O - https://raw.githubusercontent.com/shkreios/runtime-env/main/install.sh | sh
+RUN wget -O - https://shkreios.github.io/runtime-env/install.sh | sh
 
 # important to be set after install.sh as otherwise binary will placed under /app/bin/runtime-env
 WORKDIR /app/
@@ -133,9 +133,9 @@ ENTRYPOINT ["./entrypoint.sh"]
 
 # use either wget, curl or whatevery you ci env supports
 
-curl -sfL https://raw.githubusercontent.com/shkreios/runtime-env/main/install.sh | sh
+curl -sfL https://shkreios.github.io/runtime-env/install.sh | sh
 
-# wget -O - https://raw.githubusercontent.com/shkreios/runtime-env/main/install.sh | sh
+# wget -O - https://shkreios.github.io/runtime-env/install.sh | sh
 
 runtime-env # your runtime-env flags here
 ```
