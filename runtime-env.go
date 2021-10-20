@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	version = "v1.1.2"
+	version = "v1.1.3"
 	nolog   bool
 )
 
