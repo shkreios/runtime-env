@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -83,6 +84,7 @@ func keysString(m map[string]string, template string, delimiter string) string {
 	for k := range m {
 		keys = append(keys, fmt.Sprintf(template, k))
 	}
+	sort.Strings(keys)
 	return strings.Join(keys, delimiter)
 }
 
