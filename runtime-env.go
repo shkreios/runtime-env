@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	version              = "v1.1.3"
+	version              = "v1.2.0"
 	nolog                bool
 	envFile              string
 	prefix               string
