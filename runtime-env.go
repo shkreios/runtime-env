@@ -17,6 +17,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -24,13 +25,22 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
 )
 
 var (
-	version = "v1.1.3"
-	nolog   bool
+	version              = "v1.1.3"
+	nolog                bool
+	envFile              string
+	prefix               string
+	output               string
+	typeDeclarationsFile string
+	removePrefix         bool
+	noEnvs               bool
+	globalKey            string
+	watch                bool
 )
 
 func printf(format string, a ...interface{}) (n int, err error) {
@@ -40,12 +50,12 @@ func printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Printf(format, a...)
 }
 
-func load(envfile string, prefix string, removePrefix bool, noenvs bool) (map[string]string, error) {
-	if noenvs {
+func load() (map[string]string, error) {
+	if noEnvs {
 		os.Clearenv()
 	}
-	if envfile != "" {
-		err := godotenv.Load(envfile)
+	if envFile != "" {
+		err := godotenv.Load(envFile)
 		if err != nil {
 			return nil, err
 		}
@@ -126,15 +136,40 @@ func writeFile(name string, contents string) error {
 	return nil
 }
 
-func main() {
+func run() error {
+	envs, err := load()
+	if err != nil {
+		return err
+	}
 
-	var envFile string
-	var prefix string
-	var output string
-	var typeDeclarationsFile string
-	var removePrefix bool
-	var noEnvs bool
-	var globalKey string
+	printf("Following envs have been loaded: %s\n", keysString(envs, "%s", ", "))
+
+	js, err := generateJSConfig(envs, globalKey)
+	if err != nil {
+		return err
+	}
+	err = writeFile(output, js)
+	if err != nil {
+		return err
+	}
+	printf("ENVs have been writtem to %s\n", output)
+
+	if typeDeclarationsFile != "" {
+		ts, err := generateTSConfig(envs)
+		if err != nil {
+			return err
+		}
+		err = writeFile(typeDeclarationsFile, ts)
+		if err != nil {
+			return err
+		}
+		printf("Typescript declarations have been writtem to %s\n", typeDeclarationsFile)
+	}
+
+	return err
+}
+
+func main() {
 
 	app := &cli.App{
 		Version: version,
@@ -201,38 +236,53 @@ func main() {
 				Value:       false,
 				Aliases:     []string{"no-logs"},
 				Usage:       "Disable logging output",
+			}, &cli.BoolFlag{
+				Name:        "watch",
+				Destination: &watch,
+				Value:       false,
+				Aliases:     []string{"w"},
+				Usage:       "Watch .env file",
 			},
 		},
 		Action: func(c *cli.Context) error {
-			envs, err := load(envFile, prefix, removePrefix, noEnvs)
-			if err != nil {
-				return err
+			if watch && envFile == "" {
+				return errors.New("the watch falg can only be used with a .env file")
 			}
 
-			printf("Following envs have been loaded: %s\n", keysString(envs, "%s", ", "))
-
-			js, err := generateJSConfig(envs, globalKey)
-			if err != nil {
-				return err
-			}
-			err = writeFile(output, js)
-			if err != nil {
-				return err
-			}
-			printf("ENVs have been writtem to %s\n", output)
-
-			if typeDeclarationsFile != "" {
-				ts, err := generateTSConfig(envs)
+			err := run()
+			if watch {
+				watcher, err := fsnotify.NewWatcher()
 				if err != nil {
 					return err
 				}
-				err = writeFile(typeDeclarationsFile, ts)
+				defer watcher.Close()
+
+				done := make(chan bool)
+				go func() {
+					for {
+						select {
+						case event, ok := <-watcher.Events:
+							if !ok {
+								return
+							}
+							if event.Op&fsnotify.Write == fsnotify.Write {
+								run()
+							}
+						case err, ok := <-watcher.Errors:
+							if !ok {
+								return
+							}
+							log.Fatal(err)
+						}
+					}
+				}()
+
+				err = watcher.Add(envFile)
 				if err != nil {
 					return err
 				}
-				printf("Typescript declarations have been writtem to %s\n", typeDeclarationsFile)
+				<-done
 			}
-
 			return err
 		},
 	}
