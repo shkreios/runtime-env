@@ -104,10 +104,11 @@ func generateTSConfig(config map[string]string) (string, error) {
 // tslint:disable
 // jscs:disable
 // jshint ignore: start 
-// prettier-ignore
 
+// prettier-ignore
 export {};
 
+// prettier-ignore
 declare global {
 	interface Window {
 		__RUNTIME_CONFIG__: {
