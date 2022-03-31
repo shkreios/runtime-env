@@ -2,14 +2,15 @@
 # yarn lockfile v1
 
 
-binary-cli-install@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/binary-cli-install/-/binary-cli-install-1.0.0.tgz#1a88b53458b9f0c44937c0a746f8f8207dc26be0"
-  integrity sha512-GwymGJSHvQlqsD1vc6uTZ2WIyx0VsWQkIZ/6+dGJs9RlTU2wtjrZjDR898J64E1H2q1186a/ao43J6+38LATfQ==
+binary-cli-install@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/binary-cli-install/-/binary-cli-install-1.0.3.tgz#95cff52289d8d827054e719c662af79cbf1b634d"
+  integrity sha512-y2Gw1kSs3YxYn6umrBgYf+w79n1wxoWI9Hz/NizqhNi8U2uCBw7mOt5pXDviS2i9fBh1k5Gq9Ecal9HjUPeGfw==
   dependencies:
     gunzip-maybe "^1.4.2"
     node-fetch "^3.0.0"
     tar "^6.1.11"
+    type-fest "^2.5.0"
 
 browserify-zlib@^0.1.4:
   version "0.1.4"
@@ -221,6 +222,11 @@ through2@^2.0.3:
   dependencies:
     readable-stream "~2.3.6"
     xtend "~4.0.1"
+
+type-fest@^2.5.0:
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.12.1.tgz#d2be8f50bf5f8f0a5fd916d29bf3e98c17e960be"
+  integrity sha512-AiknQSEqKVGDDjtZqeKrUoTlcj7FKhupmnVUgz6KoOKtvMwRGE6hUNJ/nVear+h7fnUPO1q/htSkYKb1pyntkQ==
 
 util-deprecate@~1.0.1:
   version "1.0.2"

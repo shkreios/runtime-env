@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/shkreios/runtime-env#readme",
   "dependencies": {
-    "binary-cli-install": "^1.0.0"
+    "binary-cli-install": "^1.0.3"
   },
   "binary": {
     "name": "runtime-env",
