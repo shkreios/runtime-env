@@ -40,25 +40,27 @@ USAGE:
    runtime-env [global options]
 
 VERSION:
-   v1.0.0
+   v1.3.0
 
 AUTHOR:
    Simon Hessel <simon.hessel@kreios.lu>
 
 GLOBAL OPTIONS:
    --env-file value, -f value                   The .env file to be parsed
+   --schema-file value, --schema value          A .env file which contains a list of envs to be parsed
    --prefix value, -p value                     The env prefix to matched
    --output value, -o value                     Output file path (default: "./env.js")
    --type-declarations-file value, --dts value  Output file path for the typescript declaration file
-   --global-key value, --key value              Customize the key on which the envs will be set on window object
+   --global-key value, --key value              Customize the key on which the envs will be set on window object (default: "__RUNTIME_CONFIG__")
    --remove-prefix                              Remove the prefix from the env (default: false)
    --no-envs                                    Only read envs from file not from environment variables (default: false)
    --disable-logs, --no-logs                    Disable logging output (default: false)
+   --watch, -w                                  Watch .env file (default: false)
    --help, -h                                   show help (default: false)
    --version, -v                                print the version (default: false)
 
 COPYRIGHT:
-   Copyright © 2020 Simon Hessel
+   Copyright © 2022 Simon Hessel
 ```
 
 ## Input

@@ -1,11 +1,11 @@
 /*
-Copyright © 2020 Simon Hessel
+Copyright © 2022 Simon Hessel
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,9 +31,10 @@ import (
 )
 
 var (
-	version              = "v1.2.2"
+	version              = "v1.3.0"
 	nolog                bool
 	envFile              string
+	schemaFile           string
 	prefix               string
 	output               string
 	typeDeclarationsFile string
@@ -54,8 +55,20 @@ func load() (map[string]string, error) {
 	if noEnvs {
 		os.Clearenv()
 	}
+
+	var err error
+
 	if envFile != "" {
-		err := godotenv.Load(envFile)
+		err = godotenv.Load(envFile)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var envMap map[string]string
+
+	if schemaFile != "" {
+		envMap, err = godotenv.Read(schemaFile)
 		if err != nil {
 			return nil, err
 		}
@@ -65,16 +78,23 @@ func load() (map[string]string, error) {
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
 		key := pair[0]
-		if prefix != "" {
-			if strings.HasPrefix(key, prefix) {
-				if removePrefix {
-					key = strings.Replace(key, prefix, "", 1)
-				}
-				envs[key] = os.Getenv(pair[0])
 
+		ok := true
+		if envMap != nil {
+			_, ok = envMap[key]
+		}
+		if ok {
+			if prefix != "" {
+				if strings.HasPrefix(key, prefix) {
+					if removePrefix {
+						key = strings.Replace(key, prefix, "", 1)
+					}
+					envs[key] = os.Getenv(pair[0])
+
+				}
+			} else {
+				envs[key] = os.Getenv(pair[0])
 			}
-		} else {
-			envs[key] = os.Getenv(pair[0])
 		}
 	}
 
@@ -181,7 +201,7 @@ func main() {
 			},
 		},
 		UsageText:              "runtime-env [global options]",
-		Copyright:              "Copyright © 2020 Simon Hessel",
+		Copyright:              "Copyright © 2022 Simon Hessel",
 		EnableBashCompletion:   true,
 		Name:                   "runtime-env",
 		Usage:                  "runtime envs for SPAs",
@@ -194,6 +214,12 @@ func main() {
 				Destination: &envFile,
 				Usage:       "The .env file to be parsed",
 				Aliases:     []string{"f"},
+			},
+			&cli.StringFlag{
+				Name:        "schema-file",
+				Destination: &schemaFile,
+				Usage:       "A .env file which contains a list of envs to be parsed",
+				Aliases:     []string{"s"},
 			},
 			&cli.StringFlag{
 				Name:        "prefix",
